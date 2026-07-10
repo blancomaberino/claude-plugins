@@ -56,14 +56,21 @@ Inside any Claude Code session:
 Approve the installation when prompted. This registers both the `/codehare`
 skill and the PR-gate hook — no manual `settings.json` editing needed.
 
-### 3. (Recommended) Install the grounding tool fleet
+### 3. Grounding tool fleet — installed automatically
 
-The skill degrades gracefully without these (it reports each skipped scanner),
-but the full grounding pass needs:
+On each run the skill first checks the scanner fleet (gitleaks, semgrep,
+actionlint, hadolint, shellcheck, ripgrep) and auto-installs anything missing
+via your package manager (brew / apt / dnf / pacman, non-interactive — it never
+prompts for a sudo password). If something can't be installed automatically,
+the review pauses and asks you to run the exact command it prints, e.g.:
 
 ```bash
 brew install semgrep gitleaks hadolint actionlint shellcheck ripgrep
 ```
+
+Set `CODEHARE_AUTO_INSTALL=0` to disable install attempts (check-and-report
+only). You can also pre-install the fleet with the command above to skip the
+bootstrap entirely.
 
 ### 4. Verify
 
@@ -91,6 +98,7 @@ HEAD → `gh pr create|edit|…` is allowed.
 
 | Env var | Default | Purpose |
 |---|---|---|
+| `CODEHARE_AUTO_INSTALL` | `1` | set to `0` to stop the skill from installing missing scanners (it will just report them) |
 | `CODEHARE_GATE_CONTAINER` | `laravel.test` | docker container name filter for the gates-environment check |
 | `CODEHARE_GATE_MOUNT` | `/var/www/html` | code mount point inside that container |
 

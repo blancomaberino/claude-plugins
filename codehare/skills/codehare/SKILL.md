@@ -60,8 +60,33 @@ hunks) and any obviously-related files for context, exactly as CodeRabbit does.
 
 ## Phase 1 — Grounding pass (the real tools)
 
-Run the bundled script. It is diff-scoped, never aborts on findings, and skips
-missing tools with an install hint:
+### 1a. Ensure the tool fleet (auto-install, else ask)
+
+Before grounding, make sure the scanners exist. The bundled script checks each
+one and attempts a **non-interactive** install of anything missing (brew /
+apt-get / dnf / pacman; `CODEHARE_AUTO_INSTALL=0` makes it check-only). It may
+take a few minutes when it has to install semgrep — that's expected:
+
+```bash
+bash "$SKILL_DIR/scripts/ensure-tools.sh"
+```
+
+- **Exit 0** — full fleet available (already present or just installed).
+  Proceed to 1b.
+- **Exit 1** — some tools could not be installed; the script printed the exact
+  command(s) under `ACTION REQUIRED`. **Stop and ask the user** to run them
+  (use AskUserQuestion when available, with options like "Installed — re-check"
+  and "Proceed with partial coverage"). On sudo-based systems the script never
+  prompts for a password, so failures there are normal — the user runs the
+  printed `sudo …` command themselves. After they confirm, re-run the script.
+  Continue **without** the full fleet only if the user explicitly chooses
+  partial coverage — and then list every skipped scanner in the final report's
+  ✅ Verification section so the gap is visible.
+
+### 1b. Run the grounding script
+
+It is diff-scoped, never aborts on findings, and (as a backstop) still skips
+any missing tool with an install hint:
 
 ```bash
 bash "$SKILL_DIR/scripts/ground.sh" "$BASE"
@@ -76,8 +101,6 @@ This runs, scoped to changed files:
 - **ripgrep** heuristics — left-in `dd()`/`console.log`/`.only`/`@ts-ignore`/TODO/FIXME
 
 Treat every ⚠️ as a **lead to verify against the diff**, not an automatic finding.
-If a tool is reported missing and the change touches its domain, tell the user the
-one-line `brew install …` to unlock it — don't silently skip the coverage.
 
 ## Phase 2 — Project quality gates
 
