@@ -1,0 +1,9 @@
+{
+  "name": "coderabbit",
+  "version": "1.0.0",
+  "description": "Self-hosted CodeRabbit-equivalent PR review. Tool-grounded (semgrep, gitleaks, actionlint, hadolint, shellcheck) LLM review with committable suggestions, a PR walkthrough summary, and a PreToolUse hook that blocks `gh pr create/edit/ready/merge` until the review has approved the current commit.",
+  "author": {
+    "name": "Marcelo Blanco",
+    "email": "marcelo@one.pet"
+  }
+}

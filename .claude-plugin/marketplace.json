@@ -1,0 +1,14 @@
+{
+  "name": "marce-plugins",
+  "owner": {
+    "name": "Marcelo Blanco",
+    "email": "marcelo@one.pet"
+  },
+  "plugins": [
+    {
+      "name": "coderabbit",
+      "source": "./coderabbit",
+      "description": "Self-hosted CodeRabbit-equivalent PR review: tool-grounded LLM review, walkthrough summary, and an enforced pre-PR approval gate."
+    }
+  ]
+}
