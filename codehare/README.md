@@ -109,6 +109,10 @@ docker-compose container (e.g. Laravel Sail); otherwise the check is a no-op.
 
 - The hook fails **open** for anything that isn't a gated `gh pr` command or
   isn't a git repo, so it never interferes with other work.
+- The gate always resolves the repo **the command actually runs in** — from the
+  hook payload's working directory, including a leading `cd /path && gh pr …` —
+  never from the hook process's own location. Reviews, receipts, and blocks are
+  therefore always scoped to the repo (and worktree) being operated on.
 - The approval receipt lives at `.git/codehare/approved` — per-clone, never
   pushed, invalidated by any new commit.
 - The skill reviews; it never pushes, merges, or advances the default branch.

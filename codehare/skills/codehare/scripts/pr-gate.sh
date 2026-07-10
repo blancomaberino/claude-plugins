@@ -19,13 +19,29 @@ PY=/usr/bin/python3
 
 RAW="$(cat)"
 
-# --- is this a Bash tool call? pull out the command -------------------------
-CMD="$(printf '%s' "$RAW" | "$PY" -c 'import json,sys
+# --- is this a Bash tool call? pull out the command + effective directory ---
+# The gate must inspect the repo the command actually runs in, NOT the hook
+# process's inherited cwd. That directory is the payload's `cwd`, further
+# adjusted by a leading `cd <dir> &&`/`;` inside the command itself.
+# Output: line 1 = effective dir, line 2 = command (newlines flattened).
+OUT="$(printf '%s' "$RAW" | "$PY" -c 'import json,sys,re,os
 try: d=json.load(sys.stdin)
 except Exception: sys.exit(0)
 if d.get("tool_name")!="Bash": sys.exit(0)
-print(d.get("tool_input",{}).get("command","") or "")')"
+cmd=d.get("tool_input",{}).get("command","") or ""
+if not cmd.strip(): sys.exit(0)
+cwd=d.get("cwd") or os.getcwd()
+m=re.match(r"""\s*cd\s+(?:"([^"]+)"|\x27([^\x27]+)\x27|([^\s;&|]+))\s*(?:&&|;)""", cmd)
+if m:
+    t=os.path.expanduser(next(g for g in m.groups() if g))
+    if not os.path.isabs(t): t=os.path.join(cwd,t)
+    if os.path.isdir(t): cwd=t
+print(cwd)
+print(" ".join(cmd.splitlines()))')"
 
+[ -n "$OUT" ] || exit 0
+DIR="$(printf '%s\n' "$OUT" | head -1)"
+CMD="$(printf '%s\n' "$OUT" | tail -n +2)"
 [ -n "$CMD" ] || exit 0
 
 # --- does the command create/update a PR? -----------------------------------
@@ -34,6 +50,7 @@ echo "$CMD" | grep -Eq 'gh[[:space:]]+pr[[:space:]]+(create|edit|ready|merge|reo
 # From here we are gating a PR command → fail closed.
 block() { printf '%s\n' "$1" >&2; exit 2; }
 
+cd "$DIR" 2>/dev/null || exit 0                                  # dir gone → not ours
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0   # not a repo → not ours
 cd "$ROOT" || exit 0
 
