@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# approve.sh — record a CodeRabbit approval receipt for the current HEAD.
-# Called by the /coderabbit skill as its final step, ONLY when there are no
+# approve.sh — record a CodeHare approval receipt for the current HEAD.
+# Called by the /codehare skill as its final step, ONLY when there are no
 # unresolved 🔴 Blocking findings. The PR-gate hook (pr-gate.sh) reads this
 # receipt and allows `gh pr create|edit|…` only when it matches HEAD.
 #
@@ -20,10 +20,10 @@ if [ -n "$(git status --porcelain --untracked-files=no 2>/dev/null)" ]; then
 fi
 
 HEAD="$(git rev-parse HEAD)"
-RECEIPT="$(git rev-parse --git-path coderabbit/approved)"
+RECEIPT="$(git rev-parse --git-path codehare/approved)"
 mkdir -p "$(dirname "$RECEIPT")"
 printf '%s\n' "$HEAD" > "$RECEIPT"
 
-echo "✅ CodeRabbit approval recorded for HEAD $HEAD"
+echo "✅ CodeHare approval recorded for HEAD $HEAD"
 echo "   Receipt: $RECEIPT"
-echo "   Any new commit invalidates this — re-run /coderabbit after further changes."
+echo "   Any new commit invalidates this — re-run /codehare after further changes."

@@ -6,8 +6,8 @@
   },
   "plugins": [
     {
-      "name": "coderabbit",
-      "source": "./coderabbit",
+      "name": "codehare",
+      "source": "./codehare",
       "description": "Self-hosted CodeRabbit-equivalent PR review: tool-grounded LLM review, walkthrough summary, and an enforced pre-PR approval gate."
     }
   ]

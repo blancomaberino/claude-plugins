@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
 # pr-gate.sh — PreToolUse(Bash) hook. Blocks `gh pr create|edit|ready|merge|reopen`
-# unless /coderabbit has run clean on the CURRENT commit, and hard-blocks on any
+# unless /codehare has run clean on the CURRENT commit, and hard-blocks on any
 # secret the deterministic scan finds regardless of receipt.
 #
 # Enforcement model:
-#   - The /coderabbit skill writes a receipt (HEAD SHA) via approve.sh, but ONLY
+#   - The /codehare skill writes a receipt (HEAD SHA) via approve.sh, but ONLY
 #     after its 🔴 blocking findings are fixed and committed.
 #   - Any new commit moves HEAD, so the receipt goes stale → re-review required.
 #
@@ -39,7 +39,7 @@ cd "$ROOT" || exit 0
 
 DIRTY="$(git status --porcelain --untracked-files=no 2>/dev/null)"
 HEAD="$(git rev-parse HEAD 2>/dev/null || echo none)"
-RECEIPT="$(git rev-parse --git-path coderabbit/approved 2>/dev/null)"
+RECEIPT="$(git rev-parse --git-path codehare/approved 2>/dev/null)"
 APPROVED="$( [ -f "$RECEIPT" ] && tr -d '[:space:]' < "$RECEIPT" || echo '' )"
 
 # --- deterministic secret backstop (blocks regardless of receipt) -----------
@@ -63,8 +63,8 @@ fi
 
 # --- receipt / clean-tree enforcement ---------------------------------------
 if [ -n "$DIRTY" ]; then
-  block "⛔ CodeRabbit gate: uncommitted changes present, so the review can't cover what the PR will contain.
-Commit everything, then run /coderabbit (fix any 🔴 blockers), then retry the PR command."
+  block "⛔ CodeHare gate: uncommitted changes present, so the review can't cover what the PR will contain.
+Commit everything, then run /codehare (fix any 🔴 blockers), then retry the PR command."
 fi
 
 if [ "$APPROVED" = "$HEAD" ] && [ "$HEAD" != "none" ]; then
@@ -72,15 +72,15 @@ if [ "$APPROVED" = "$HEAD" ] && [ "$HEAD" != "none" ]; then
 fi
 
 if [ -z "$APPROVED" ]; then
-  block "⛔ CodeRabbit gate: this branch has not passed /coderabbit review.
+  block "⛔ CodeHare gate: this branch has not passed /codehare review.
 Before creating or updating the PR you MUST:
-  1. Run  /coderabbit   and fix every 🔴 Blocking finding (address 🟡 too, or justify).
+  1. Run  /codehare   and fix every 🔴 Blocking finding (address 🟡 too, or justify).
   2. Commit the fixes.
   3. The skill records approval for the committed HEAD ($HEAD).
-Then retry this command. (Enforced by the coderabbit plugin's pr-gate hook.)"
+Then retry this command. (Enforced by the codehare plugin's pr-gate hook.)"
 else
-  block "⛔ CodeRabbit gate: the approval is stale — it was recorded for a different commit.
+  block "⛔ CodeHare gate: the approval is stale — it was recorded for a different commit.
   approved: $APPROVED
   current : $HEAD
-New commits landed since the last review. Re-run /coderabbit, fix any findings, and let it re-approve HEAD, then retry."
+New commits landed since the last review. Re-run /codehare, fix any findings, and let it re-approve HEAD, then retry."
 fi

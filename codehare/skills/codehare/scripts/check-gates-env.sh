@@ -7,15 +7,15 @@
 # mean nothing. Run this before trusting containerized gate output.
 #
 # Config (env vars):
-#   CODERABBIT_GATE_CONTAINER — container name filter (default: laravel.test)
-#   CODERABBIT_GATE_MOUNT     — code mount point inside it (default: /var/www/html)
+#   CODEHARE_GATE_CONTAINER — container name filter (default: laravel.test)
+#   CODEHARE_GATE_MOUNT     — code mount point inside it (default: /var/www/html)
 #
 # Exit 0 always (advisory); prints ✅ when aligned, ⚠️ + guidance when not.
 
 set -uo pipefail
 
-CONTAINER="${CODERABBIT_GATE_CONTAINER:-laravel.test}"
-MOUNT="${CODERABBIT_GATE_MOUNT:-/var/www/html}"
+CONTAINER="${CODEHARE_GATE_CONTAINER:-laravel.test}"
+MOUNT="${CODEHARE_GATE_MOUNT:-/var/www/html}"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
 HEAD="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null)"

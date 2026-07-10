@@ -1,5 +1,5 @@
 ---
-name: coderabbit
+name: codehare
 description: >
   Self-hosted CodeRabbit-equivalent PR review. Reproduces CodeRabbit's pipeline —
   diff-scoped context gathering, a real lint/SAST/secret-scan grounding pass
@@ -7,7 +7,7 @@ description: >
   LLM review with committable suggestions, a PR walkthrough summary, and
   cross-cutting checks (tests-for-changed-paths, description-vs-diff). Orchestrates
   the existing /security-review and /simplify skills instead of duplicating
-  them. Use when the user says "coderabbit", "review my PR/branch/diff like
+  them. Use when the user says "codehare", "coderabbit", "review my PR/branch/diff like
   coderabbit", "AI code review", or before opening a pull request.
 ---
 
@@ -34,7 +34,7 @@ this SKILL.md inside the installed plugin. Resolve them from this file's
 location and set once:
 
 ```bash
-SKILL_DIR="<directory containing this SKILL.md>"   # e.g. ${CLAUDE_PLUGIN_ROOT}/skills/coderabbit
+SKILL_DIR="<directory containing this SKILL.md>"   # e.g. ${CLAUDE_PLUGIN_ROOT}/skills/codehare
 ```
 
 ---
@@ -100,8 +100,8 @@ container's tests greenlight code you're not reviewing:
 bash "$SKILL_DIR/scripts/check-gates-env.sh"
 ```
 
-(Container name and mount path configurable via `CODERABBIT_GATE_CONTAINER` /
-`CODERABBIT_GATE_MOUNT`; defaults `laravel.test` / `/var/www/html`.) If it
+(Container name and mount path configurable via `CODEHARE_GATE_CONTAINER` /
+`CODEHARE_GATE_MOUNT`; defaults `laravel.test` / `/var/www/html`.) If it
 reports a ⚠️ MISMATCH, either align the checkout or run the gates another way —
 and in the report, mark Phase-2 gates as **not run against this diff** rather
 than claiming a green that isn't real.
